@@ -1,0 +1,65 @@
+{
+  "blogId": "speciai_",
+  "posts": [
+    {
+      "slug": "2026-08-04-접대비-한도",
+      "title": "접대비 한도 2026년 기준 총정리, 중소기업 3600만원 계산법",
+      "keyword": "접대비 한도",
+      "category": "세무",
+      "file": "posts/2026-08-04-접대비-한도.md",
+      "status": "draft",
+      "postId": null,
+      "publishedAt": null,
+      "views": null,
+      "history": [
+        {
+          "date": "2026-08-04",
+          "rank": null,
+          "top": [
+            "h801223/223276979525",
+            "taxagent1123/222523350784",
+            "savethetax/222282460278",
+            "nice3673/223004918431",
+            "kicpa1/221515033976"
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "2026-08-04-취업규칙-변경-신고-방법",
+      "title": "취업규칙 변경 신고, 10인 이상이면 놓치면 안 되는 3단계",
+      "keyword": "취업규칙 변경 신고",
+      "category": "노무",
+      "file": "posts/2026-08-04-취업규칙-변경-신고-방법.md",
+      "status": "draft",
+      "postId": null,
+      "publishedAt": null,
+      "views": null,
+      "history": []
+    },
+    {
+      "slug": "2026-08-04-취업규칙-불이익-변경",
+      "title": "취업규칙 불이익변경, 과반수 동의 없으면 무효되는 5가지 절차",
+      "keyword": "취업규칙 불이익변경",
+      "category": "노무",
+      "file": "posts/2026-08-04-취업규칙-불이익-변경.md",
+      "status": "draft",
+      "postId": null,
+      "publishedAt": null,
+      "views": null,
+      "history": []
+    },
+    {
+      "slug": "2026-08-04-취업규칙-신고-대상",
+      "title": "취업규칙 신고 대상, 상시 10명 기준과 과태료 500만원 정리",
+      "keyword": "취업규칙 신고 대상",
+      "category": "노무",
+      "file": "posts/2026-08-04-취업규칙-신고-대상.md",
+      "status": "draft",
+      "postId": null,
+      "publishedAt": null,
+      "views": null,
+      "history": []
+    }
+  ]
+}

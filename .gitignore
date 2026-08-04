@@ -1,0 +1,25 @@
+node_modules/
+.env
+*.log
+
+# ─── 렌더 결과 — 스크립트로 다시 만들 수 있습니다 ───
+# 카드 내용(_spec.json)만 남겨서 재현 가능하게 둡니다.
+out/**
+!out/cards/
+!out/cards/*/
+!out/cards/*/_spec.json
+
+# 세팅 가이드 PDF — node pdf.mjs 로 재생성
+*.pdf
+
+# ─── 남의 블로그 본문 ───
+# research/extract.mjs 가 긁어온 상위 노출 글 전문입니다.
+# 학습용 참고 자료일 뿐 우리 저작물이 아니므로 저장소에 넣지 않습니다.
+# 필요하면 `node research/extract.mjs` 로 다시 수집합니다.
+research/out/corpus/
+
+# 백업 스냅샷
+*.bak
+research/out/*백업*.json
+
+.DS_Store

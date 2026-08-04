@@ -1,0 +1,17 @@
+{
+  "name": "speciai-blog",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "speciai.team 네이버 블로그 — 이미지 렌더러 · 리서치 · 글 생성기",
+  "scripts": {
+    "render": "node render.mjs",
+    "pdf": "node pdf.mjs",
+    "study": "node research/study.mjs",
+    "write": "node generate.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.115.0",
+    "puppeteer": "^25.4.0"
+  }
+}
