@@ -22,6 +22,17 @@
             "nice3673/223004918431",
             "kicpa1/221515033976"
           ]
+        },
+        {
+          "date": "2026-08-08",
+          "rank": null,
+          "top": [
+            "h801223/223276979525",
+            "taxagent1123/222523350784",
+            "savethetax/222282460278",
+            "nice3673/223004918431",
+            "kicpa1/221515033976"
+          ]
         }
       ]
     },
@@ -35,7 +46,19 @@
       "postId": null,
       "publishedAt": null,
       "views": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-08-08",
+          "rank": null,
+          "top": [
+            "modusign/224056276385",
+            "amicuslex/224198109198",
+            "hr_green/224343783480",
+            "hrdesk_/224340019266",
+            "yesformstory/224355383100"
+          ]
+        }
+      ]
     },
     {
       "slug": "2026-08-04-취업규칙-불이익-변경",
@@ -47,7 +70,19 @@
       "postId": null,
       "publishedAt": null,
       "views": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-08-08",
+          "rank": null,
+          "top": [
+            "nzcpla/224350323537",
+            "leighbor/224359238994",
+            "cplamo/224357571882",
+            "hong8647/224351527224",
+            "inpyeonglaw/224366958858"
+          ]
+        }
+      ]
     },
     {
       "slug": "2026-08-04-취업규칙-신고-대상",
@@ -59,7 +94,19 @@
       "postId": null,
       "publishedAt": null,
       "views": null,
-      "history": []
+      "history": [
+        {
+          "date": "2026-08-08",
+          "rank": null,
+          "top": [
+            "shoplworks/223448424751",
+            "daouofficehr/224302466115",
+            "rightlabor/224354158232",
+            "inpyeonglaw/224366958858",
+            "papanero/224363920337"
+          ]
+        }
+      ]
     }
   ]
 }
