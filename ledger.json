@@ -9,15 +9,15 @@
       "file": "posts/2026-08-04-접대비-한도.md",
       "ruleset": 1,
       "shape": {
-        "chars": 3006,
+        "chars": 3158,
         "images": 20,
         "headings": 7,
-        "paragraphs": 39,
-        "paraLen": 78,
+        "paragraphs": 40,
+        "paraLen": 79,
         "tables": 10,
         "titleLen": 36,
         "exactKeyword": 3,
-        "coreWord": 48
+        "coreWord": 49
       },
       "status": "draft",
       "postId": null,
@@ -115,7 +115,7 @@
       "file": "posts/2026-08-04-취업규칙-불이익-변경.md",
       "ruleset": 1,
       "shape": {
-        "chars": 2227,
+        "chars": 2278,
         "images": 21,
         "headings": 7,
         "paragraphs": 15,
@@ -123,7 +123,7 @@
         "tables": 13,
         "titleLen": 34,
         "exactKeyword": 1,
-        "coreWord": 21
+        "coreWord": 20
       },
       "status": "draft",
       "postId": null,
@@ -210,15 +210,15 @@
       "file": "posts/2026-08-09-취업규칙-신고-대상.md",
       "ruleset": 2,
       "shape": {
-        "chars": 5805,
+        "chars": 5931,
         "images": 15,
         "headings": 7,
-        "paragraphs": 165,
+        "paragraphs": 168,
         "paraLen": 34,
         "tables": 42,
         "titleLen": 26,
         "exactKeyword": 0,
-        "coreWord": 27
+        "coreWord": 26
       },
       "status": "draft",
       "postId": null,
@@ -234,11 +234,11 @@
       "file": "posts/2026-08-09-취업규칙-변경-신고-방법.md",
       "ruleset": 2,
       "shape": {
-        "chars": 4196,
+        "chars": 4284,
         "images": 16,
         "headings": 7,
-        "paragraphs": 133,
-        "paraLen": 34,
+        "paragraphs": 134,
+        "paraLen": 35,
         "tables": 17,
         "titleLen": 25,
         "exactKeyword": 0,

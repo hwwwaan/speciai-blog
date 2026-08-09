@@ -92,23 +92,72 @@ const 표식뽑기 = (t) => {
   return [...out]
 }
 
+// 글 끝의 「관련 글」 목록이나 목차는 본문이 아니다. 낱말이 잘 겹쳐서 자꾸 인용으로 올라오는데,
+// 검토자에게 링크 목록을 보여주면 「이게 뭘 보라는 거지」가 된다. 아예 후보에서 뺀다.
+const 본문아님 = (s) =>
+  s.startsWith('#') ||
+  s.startsWith('|') ||
+  s.includes('(발행 예정)') ||
+  (s.match(/\]\(/g) || []).length >= 2 ||   // 한 줄에 링크가 둘 이상이면 목록이다
+  /^[-*]\s*\[/.test(s)
+
 const 문장들 = (body) =>
   body
     .replace(/!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?/g, ' ')  // 이미지 자리 제거
     .split(/(?<=[.!?습니다요])\s+|\n{2,}/)
     .map(s => s.replace(/\s+/g, ' ').trim())
-    .filter(s => s.length > 25 && !s.startsWith('#') && !s.startsWith('|'))
+    .filter(s => s.length > 25 && !본문아님(s))
 
+// 표식이 없는 항목이 훨씬 많다. 「전통시장 특례에서 제외되는 소비성 서비스업의 범위 확인」
+// 같은 문장에는 조문 번호도 금액도 없다. 28건 중 20건이 이랬다.
+// 그래서 표식으로 못 찾으면 낱말 겹침으로 한 번 더 찾는다.
+//
+// 검토 항목에는 «확인·검토·여부» 같이 어느 항목에나 나오는 말이 섞여 있다.
+// 그런 말로 문장을 고르면 아무 문장이나 걸리므로 먼저 걷어낸다.
+const 흔한말 = new Set([
+  '확인', '검토', '여부', '필요', '최종', '재확인', '보강', '점검', '수정', '기준',
+  '내용', '표기', '명시', '근거', '출처', '관련', '경우', '항목', '부분', '사항',
+  '적정성', '정확성', '일치', '누락', '해당', '이후', '최신', '최신화', '현행',
+])
+const 낱말뽑기 = (t) =>
+  [...new Set((t.match(/[가-힣A-Za-z0-9]{2,}/g) || []))]
+    .filter(w => !흔한말.has(w) && w.length >= 2)
+
+// 두 가지 방식으로 찾는데 미더운 정도가 다르다. 그래서 어느 쪽으로 찾았는지 같이 돌려준다.
+//   확실 — 조문 번호나 금액이 그대로 걸린 것. 그 문장이 맞다
+//   짐작 — 낱말이 겹쳐서 고른 것. 대개 맞지만 가끔 엉뚱하다
+// 섞어서 「본문」이라고만 달면 검토자가 틀린 인용을 믿고 넘어간다.
 const 짚어주기 = (항목, body) => {
+  const 문장 = 문장들(body)
+
+  // 1차 — 조문 번호·금액·서식 번호처럼 되짚기 쉬운 표식
   const 표식 = 표식뽑기(항목)
-  if (!표식.length) return []
-  const cands = 문장들(body).map(s => {
-    const 납작 = s.replace(/\s+/g, '')
-    return { s, n: 표식.filter(k => 납작.includes(k)).length }
-  })
-  const 최고 = Math.max(0, ...cands.map(c => c.n))
-  if (최고 === 0) return []
-  return cands.filter(c => c.n === 최고).slice(0, 2).map(c => c.s)
+  if (표식.length) {
+    const cands = 문장.map(s => {
+      const 납작 = s.replace(/\s+/g, '')
+      return { s, n: 표식.filter(k => 납작.includes(k)).length }
+    })
+    const 최고 = Math.max(0, ...cands.map(c => c.n))
+    if (최고 > 0) return { 확실: true, 문장: cands.filter(c => c.n === 최고).slice(0, 2).map(c => c.s) }
+  }
+
+  // 2차 — 낱말 겹침. 두 낱말 이상 겹쳐야 인정한다.
+  // 한 낱말만 겹치면 엉뚱한 문장이 올라와서, 없느니만 못하다.
+  //
+  // 개수만 세면 «신고»·«변경» 같은 짧고 흔한 말이 여러 개 걸린 문장이 이긴다.
+  // 긴 낱말일수록 그 항목에만 나오는 말이므로, 길이를 더해 무게를 준다.
+  // (길이 3자 이상을 요구해봤더니 «게시»·«주지»·«기한» 같은 멀쩡한 두 자 낱말이 날아가
+  //  오히려 못 찾는 항목이 늘었다. 그래서 무게로만 순서를 매긴다.)
+  const 낱말 = 낱말뽑기(항목)
+  if (낱말.length < 2) return { 확실: false, 문장: [] }
+  const cands = 문장
+    .map(s => {
+      const 맞은것 = 낱말.filter(w => s.includes(w))
+      return { s, n: 맞은것.length, 무게: 맞은것.reduce((a, w) => a + w.length, 0) }
+    })
+    .filter(c => c.n >= 2)
+    .sort((a, b) => b.무게 - a.무게 || a.s.length - b.s.length)
+  return { 확실: false, 문장: cands.slice(0, 2).map(c => c.s) }
 }
 
 // ─── 항목 분류 ──────────────────────────────────────────────
@@ -143,9 +192,10 @@ const 본문HTML = 글목록.map((g, gi) => {
     통계[k.이름] = (통계[k.이름] || 0) + 1
     // 빈자리는 조문·금액 같은 표식이 없어 되찾기가 안 먹는다.
     // 대신 그 자리가 박힌 문장을 그대로 보여주는 게 검토자에게 가장 빠르다.
-    const 인용 = 빈자리
-      ? 문장들(g.본문).filter(s => s.includes(c.slice(0, 20))).slice(0, 1)
+    const 찾은것 = 빈자리
+      ? { 확실: true, 문장: 문장들(g.본문).filter(s => s.includes(c.slice(0, 20))).slice(0, 1) }
       : 짚어주기(c, g.본문)
+    const 인용 = 찾은것.문장
     return `
       <li class="item${k.급함 ? ' urgent' : ''}">
         <div class="ihead">
@@ -153,7 +203,9 @@ const 본문HTML = 글목록.map((g, gi) => {
           <span class="kind k-${k.key}">${esc(k.이름)}</span>
         </div>
         <p class="ask">${esc(c)}</p>
-        ${인용.length ? `<div class="quote"><span class="qlbl">본문</span>${인용.map(s => `<p>${esc(s)}</p>`).join('')}</div>` : ''}
+        ${인용.length
+          ? `<div class="quote${찾은것.확실 ? '' : ' guess'}"><span class="qlbl">${찾은것.확실 ? '본문' : '본문 — 짐작으로 찾았습니다'}</span>${인용.map(s => `<p>${esc(s)}</p>`).join('')}</div>`
+          : `<p class="nofind">본문에서 해당 대목을 자동으로 찾지 못했습니다. 글 전체를 훑어봐 주세요.</p>`}
         <div class="answer"><span class="albl">검토 의견</span><div class="blank"></div></div>
       </li>`
   }).join('')
@@ -269,6 +321,9 @@ const html = `<!doctype html>
   .quote p { margin:0 0 7px; font-size:13.5px; color:var(--ink-soft); line-height:1.6; max-width:70ch; }
   .quote p:last-child { margin-bottom:0; }
 
+  .quote.guess { border-left:2px solid var(--line); }
+  .quote.guess .qlbl { color:var(--wip, #8E5313); }
+  .nofind { margin:12px 0 0; font-size:13px; color:var(--muted); font-style:italic; }
   .answer { margin:12px 0 0; }
   .blank { border-bottom:1px dashed var(--line); height:26px; }
 
