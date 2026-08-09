@@ -78,7 +78,9 @@ node rank.mjs --publish 2026-08-04-접대비-한도 https://blog.naver.com/speci
 | `research/topics.mjs` | 소재 발굴. 네이버 자동완성에서 **실제 검색어**를 긁습니다 |
 | `research/study.mjs` | 키워드별 상위 10건 수집 → 경쟁도 |
 | `research/extract.mjs` | 상위 글 본문을 구조 그대로 추출 |
-| `research/글쓰기-규칙.md` | 상위 174건에서 뽑은 규격. **`generate.mjs` 의 시스템 프롬프트입니다** |
+| `research/글쓰기-규칙.md` | 상위 1,004건 순위 분석으로 뽑은 규격(2판). **`generate.mjs` 의 시스템 프롬프트입니다** |
+| `research/교본 — 잘 쓴 글 뜯어보기.md` | 상위 글 78편 정독. **키워드마다 판이 다르다**는 걸 실물로 보여줍니다 |
+| `research/순위분석.mjs` | 무엇이 순위를 가르는지 재계산. 같은 키워드 안에서 짝비교 |
 | `research/전략.md` | 어느 키워드부터 칠지 |
 
 ### 측정하기

@@ -112,6 +112,31 @@ const study = read(join(RESEARCH, 'out', 'study.md'))
 const studyLines = study.split('\n').filter(l => topic.split(/\s+/).some(w => l.includes(w)))
   .filter(l => l.startsWith('|')).slice(0, 6).join('\n')
 
+// ─── 분량은 키워드마다 다르다 ───
+//
+//   "2,800자" 는 전체 평균일 뿐이다. 실제로 1페이지를 열어 보면 판이 전혀 다르다.
+//     「접대비 한도」        1위가 694자, 2·3위는 2021년 글  → 무주공산
+//     「취업규칙 신고 대상」   1~6위가 3,500~6,100자          → 격전지
+//   같은 분량으로 두 곳을 다 치면 한쪽은 낭비, 한쪽은 헛수고다.
+//   그래서 그 키워드 1페이지의 실제 글자 수를 보고 목표를 정한다.
+//   (근거: research/교본 — 잘 쓴 글 뜯어보기.md)
+const 경쟁분량 = () => {
+  try {
+    const P = Object.values(JSON.parse(read(join(RESEARCH, 'out', 'posts.json'))))
+      .filter(p => p && p.rank && p.keyword)
+    const 낱말 = topic.split(/\s+/).filter(w => w.length >= 2)
+    // 정확히 같은 키워드가 없으면 낱말이 다 들어간 키워드로 넓힌다
+    let g = P.filter(p => p.keyword === topic)
+    if (g.length < 5) g = P.filter(p => 낱말.every(w => p.keyword.includes(w)))
+    if (g.length < 5) return null
+    const 상위 = g.filter(p => p.rank <= 5).map(p => p.chars).sort((a, b) => a - b)
+    if (!상위.length) return null
+    const 중앙 = 상위[상위.length >> 1]
+    return { 중앙, 최대: 상위.at(-1), 표본: g.length, 목표: Math.max(2400, Math.round(중앙 * 1.15 / 100) * 100) }
+  } catch { return null }
+}
+const 분량 = 경쟁분량()
+
 // ─── 프롬프트 ───────────────────────────────────────────────
 const SYSTEM = `당신은 speciai.team 의 콘텐츠 담당자입니다.
 
@@ -119,7 +144,7 @@ speciai.team 은 중소기업·스타트업을 위한 AI 법률·세무·노무 
 독자는 직원 5~50명 규모 회사의 대표나 관리 담당자입니다. 법을 전공하지 않았고,
 규정을 몰라서 과태료를 맞는 상황을 가장 두려워합니다.
 
-아래는 네이버 블로그 상위 노출 글 174건을 수집해 분석한 규칙입니다.
+아래는 네이버 블로그 상위 노출 글 1,004건을 순위별로 분석해 뽑은 규칙입니다.
 이 규격을 지켜야 검색에 걸립니다. 그대로 따르세요.
 
 ${rules}
@@ -164,8 +189,12 @@ checks:
 **여는 \`---\` 와 닫는 \`---\` 사이의 여섯 필드를 절대 빠뜨리지 마세요.**
 제목만 있고 나머지가 없거나, \`---\` 만 찍고 바로 본문으로 넘어가면 파일이 깨집니다.
 
-**분량은 본문 기준 2,800~3,300자입니다.** 이보다 짧으면 얕아 보여 검색에서 밀리고,
-길면 이탈률이 올라갑니다. 짧게 끝내지 말고 이 범위를 채우세요.
+${분량
+    ? `**분량은 본문 기준 ${분량.목표.toLocaleString()}자 이상입니다.**
+이 키워드의 현재 1~5위 글이 중앙값 ${분량.중앙.toLocaleString()}자, 최대 ${분량.최대.toLocaleString()}자입니다.
+상위권보다 얇으면 검색에서 밀립니다. 반드시 이 선을 넘기세요.`
+    : `**분량은 본문 기준 2,800~3,300자입니다.** 이보다 짧으면 얕아 보여 검색에서 밀리고,
+길면 이탈률이 올라갑니다. 짧게 끝내지 말고 이 범위를 채우세요.`}
 대신 곁가지로 늘리지 말고 **독자가 당장 판단하는 데 필요한 것**으로 채웁니다 —
 요건, 금액, 절차, 예외, 그리고 "우리 회사는 어디에 해당하는가".
 
@@ -282,7 +311,9 @@ const checks = (full.match(/\[확인 필요[^\]]*\]/g) || []).length
 console.log(`\n\n${'─'.repeat(50)}`)
 console.log(`저장 → ${dest}`)
 console.log(`본문 ${chars.toLocaleString()}자 · 이미지 자리 ${images} · 소제목 ${heads}`)
-console.log(`목표   2,800자 내외 · 이미지 15 · 소제목 5~6 (7개 넘으면 과함)`)
+console.log(분량
+  ? `목표   ${분량.목표.toLocaleString()}자 이상 (이 키워드 1~5위 중앙 ${분량.중앙.toLocaleString()}자) · 이미지 15 · 소제목 5~6`
+  : `목표   2,800자 내외 · 이미지 15 · 소제목 5~6 (7개 넘으면 과함)`)
 if (!hasFm) console.log(`\n⚠ 프론트매터가 없습니다 — rank.mjs 가 키워드를 못 읽습니다. 다시 생성하세요.`)
 if (checks) console.log(`\n⚠ 확인이 필요한 항목 ${checks}건이 본문에 표시돼 있습니다.`)
 console.log(`\n초고입니다. 발행 전에 전문가 검토를 거치세요.`)
