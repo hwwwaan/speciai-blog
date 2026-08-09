@@ -77,7 +77,7 @@
         "exactKeyword": 2,
         "coreWord": 26
       },
-      "status": "draft",
+      "status": "superseded",
       "postId": null,
       "publishedAt": null,
       "views": null,
@@ -104,7 +104,8 @@
             "barunnomu/224333445211"
           ]
         }
-      ]
+      ],
+      "supersededBy": "2026-08-09-취업규칙-변경-신고-방법"
     },
     {
       "slug": "2026-08-04-취업규칙-불이익-변경",
@@ -171,7 +172,7 @@
         "exactKeyword": 2,
         "coreWord": 28
       },
-      "status": "draft",
+      "status": "superseded",
       "postId": null,
       "publishedAt": null,
       "views": null,
@@ -198,7 +199,56 @@
             "papanero/224363920337"
           ]
         }
-      ]
+      ],
+      "supersededBy": "2026-08-09-취업규칙-신고-대상"
+    },
+    {
+      "slug": "2026-08-09-취업규칙-신고-대상",
+      "title": "취업규칙 신고 대상, 상시 10명 기준과 계산법",
+      "keyword": "취업규칙 신고 대상",
+      "category": "노무",
+      "file": "posts/2026-08-09-취업규칙-신고-대상.md",
+      "ruleset": 2,
+      "shape": {
+        "chars": 5614,
+        "images": 15,
+        "headings": 6,
+        "paragraphs": 161,
+        "paraLen": 34,
+        "tables": 42,
+        "titleLen": 26,
+        "exactKeyword": 0,
+        "coreWord": 24
+      },
+      "status": "draft",
+      "postId": null,
+      "publishedAt": null,
+      "views": null,
+      "history": []
+    },
+    {
+      "slug": "2026-08-09-취업규칙-변경-신고-방법",
+      "title": "취업규칙 변경 신고 방법, 절차 빠뜨리면 무효",
+      "keyword": "취업규칙 변경 신고 방법",
+      "category": "노무",
+      "file": "posts/2026-08-09-취업규칙-변경-신고-방법.md",
+      "ruleset": 2,
+      "shape": {
+        "chars": 3945,
+        "images": 16,
+        "headings": 6,
+        "paragraphs": 128,
+        "paraLen": 34,
+        "tables": 17,
+        "titleLen": 25,
+        "exactKeyword": 0,
+        "coreWord": 34
+      },
+      "status": "draft",
+      "postId": null,
+      "publishedAt": null,
+      "views": null,
+      "history": []
     }
   ]
 }

@@ -25,9 +25,19 @@ const POSTS = join(HERE, 'posts')
 const 걸러내기 = process.argv[2] || ''
 
 // ─── 글 읽기 ────────────────────────────────────────────────
+// 새 초고가 대체한 옛 초고는 발행하지 않으므로 검토도 받지 않는다.
+// 검토자에게 안 낼 글까지 보내면 시간을 버리게 한다.
+const 대체됨 = (() => {
+  try {
+    const L = JSON.parse(readFileSync(join(HERE, 'ledger.json'), 'utf8'))
+    return new Set(L.posts.filter(p => p.status === 'superseded').map(p => p.slug))
+  } catch { return new Set() }
+})()
+
 // «.발행본.md» 는 초안과 본문이 같고 이미지 경로만 다르다. 초안만 본다.
 const 파일들 = readdirSync(POSTS)
   .filter(f => f.endsWith('.md') && !f.includes('발행본'))
+  .filter(f => !대체됨.has(f.replace(/\.md$/, '')))
   .filter(f => !걸러내기 || f.includes(걸러내기))
   .sort()
 

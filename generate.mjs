@@ -295,6 +295,59 @@ function tidy(text) {
 
 full = tidy(full)
 
+// ─── 프론트매터 복구 ─────────────────────────────────────────
+//
+//   긴 글을 쓰라고 시키면 모델이 «---» 만 찍고 본문으로 직행하는 일이 반복됐다.
+//   프롬프트로 몇 번을 다잡아도 재발한다 — 본문 쓰기에 집중할수록 앞머리를 흘린다.
+//   그래서 지시로 막지 않고, 빠지면 본문을 읽어 다시 만든다.
+//   구조화 출력이라 필드가 빠질 수 없고, 본문은 이미 나와 있으니 값도 싸다.
+const 프론트매터있나 = t => /^---\n[\s\S]*?\n---\n/.test(t) && /^title:/m.test(t.split('\n---\n')[0])
+
+if (!프론트매터있나(full)) {
+  process.stdout.write('\n\n프론트매터가 빠졌습니다. 본문을 읽어 다시 만듭니다… ')
+  const 본문 = full.replace(/^---\s*\n/, '')
+  const r = await client.messages.create({
+    model: 'claude-opus-5',
+    max_tokens: 4000,
+    output_config: {
+      format: {
+        type: 'json_schema',
+        schema: {
+          type: 'object',
+          properties: {
+            title: { type: 'string', description: '본문에 맞는 제목. 36자 내외, 핵심 낱말을 앞에' },
+            category: { type: 'string', enum: ['법률', '세무', '노무', '컴플라이언스 사례'] },
+            keyword: { type: 'string', description: '이 글이 노리는 검색어' },
+            tags: { type: 'array', items: { type: 'string' }, description: '해시태그 12개. # 없이 낱말만' },
+            sources: { type: 'array', items: { type: 'string' }, description: '본문이 실제로 인용한 법령·자료. 조번호까지' },
+            checks: { type: 'array', items: { type: 'string' }, description: '발행 전 전문가가 확인해야 할 항목. 본문의 수치·조문·판례 중 확인이 필요한 것' },
+          },
+          required: ['title', 'category', 'keyword', 'tags', 'sources', 'checks'],
+          additionalProperties: false,
+        },
+      },
+    },
+    messages: [{
+      role: 'user',
+      content: `아래는 네이버 블로그에 올릴 글의 본문입니다. 노린 검색어는 「${topic}」입니다.\n`
+        + `본문을 읽고 프론트매터를 만들어 주세요. 본문에 없는 내용을 지어내지 마세요.\n`
+        + `sources 는 본문이 실제로 인용한 것만, checks 는 본문에서 확인이 필요해 보이는 것만 적습니다.\n\n`
+        + 본문.slice(0, 60000),
+    }],
+  })
+  const d = JSON.parse(r.content.find(b => b.type === 'text').text)
+  const yaml = ['---',
+    `title: ${d.title}`,
+    `category: ${category || d.category}`,
+    `keyword: ${d.keyword}`,
+    `tags: [${d.tags.join(', ')}]`,
+    'sources:', ...d.sources.map(s => `  - ${s}`),
+    'checks:', ...d.checks.map(s => `  - ${s}`),
+    '---', ''].join('\n')
+  full = yaml + 본문.replace(/^\s*\n/, '')
+  console.log(`완료 — 근거 ${d.sources.length}건 · 검토 ${d.checks.length}건`)
+}
+
 // ─── 저장 ───────────────────────────────────────────────────
 const today = new Date().toISOString().slice(0, 10)
 const slug = topic.replace(/\s+/g, '-').replace(/[^\wㄱ-ㅎ가-힣-]/g, '')
@@ -302,7 +355,7 @@ const dest = join(POSTS, `${today}-${slug}.md`)
 writeFileSync(dest, full)
 
 // 프론트매터는 첫 줄의 --- 부터 다음 --- 줄까지. 본문 중간의 구분선에 걸리지 않게 줄 단위로 자른다
-const hasFm = /^---\n[\s\S]*?\n---\n/.test(full)
+const hasFm = 프론트매터있나(full)
 const chars = full.replace(/^---\n[\s\S]*?\n---\n/, '').replace(/!\[[^\]]*\]\([^)]*\)/g, '').length
 const images = (full.match(/!\[/g) || []).length
 const heads = (full.match(/^## /gm) || []).length

@@ -188,6 +188,9 @@ let measured = 0
 
 for (const p of ledger.posts) {
   if (!p.keyword) { console.log(`— ${p.slug}: 목표 키워드가 없어 건너뜁니다`); continue }
+  // 같은 키워드를 새 초고가 대체했으면 옛 초고는 안 잰다.
+  // 둘 다 올리면 우리끼리 중복 문서가 되므로 발행 대상이 아니다.
+  if (p.status === 'superseded') { console.log(`— ${p.slug}: 대체됨 (${p.supersededBy})`); continue }
 
   await sleep(700)
   let hits
