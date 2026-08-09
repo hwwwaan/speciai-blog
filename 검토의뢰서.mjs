@@ -58,12 +58,17 @@ const 글목록 = 파일들.map(f => {
     return b ? b[1].trim().split('\n').map(l => l.replace(/^\s*-\s*/, '').trim()) : []
   }
 
+  // 본문에 «[확인 필요: …]» 로 비워둔 자리는 checks 에 안 적혀 있을 때가 있다.
+  // 그런데 이건 독자 눈에 그대로 보이는 구멍이라 가장 급하다. 따로 긁어 맨 앞에 올린다.
+  const 빈자리 = [...body.matchAll(/[`]?\[확인 필요:?\s*([^\]]*)\][`]?/g)].map(m => m[1].trim())
+
   return {
     파일: f,
     제목: 한줄('title') || f,
     분야: 한줄('category') || '',
     근거: 목록('sources'),
     검토: 목록('checks'),
+    빈자리,
     본문: body,
   }
 }).filter(Boolean)
@@ -123,11 +128,24 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;',
 let 번호 = 0
 const 통계 = {}
 const 본문HTML = 글목록.map((g, gi) => {
-  const 항목HTML = g.검토.map(c => {
+  // 본문 빈자리를 먼저, 그 다음 checks. 이미 checks 에 같은 말이 있으면 겹쳐 싣지 않는다.
+  const 겹침 = (t) => g.검토.some(c => c.includes(t.slice(0, 12)))
+  const 목록전체 = [
+    ...g.빈자리.filter(t => !겹침(t)).map(t => ({ 글: `[확인 필요: ${t}]`, 빈자리: true })),
+    ...g.검토.map(c => ({ 글: c })),
+  ]
+
+  const 항목HTML = 목록전체.map(({ 글: c, 빈자리 }) => {
     번호++
-    const k = 갈래(c)
+    const k = 빈자리
+      ? { key: 'blank', 이름: '본문이 비어 있음', 급함: true }
+      : 갈래(c)
     통계[k.이름] = (통계[k.이름] || 0) + 1
-    const 인용 = 짚어주기(c, g.본문)
+    // 빈자리는 조문·금액 같은 표식이 없어 되찾기가 안 먹는다.
+    // 대신 그 자리가 박힌 문장을 그대로 보여주는 게 검토자에게 가장 빠르다.
+    const 인용 = 빈자리
+      ? 문장들(g.본문).filter(s => s.includes(c.slice(0, 20))).slice(0, 1)
+      : 짚어주기(c, g.본문)
     return `
       <li class="item${k.급함 ? ' urgent' : ''}">
         <div class="ihead">
@@ -143,7 +161,7 @@ const 본문HTML = 글목록.map((g, gi) => {
   return `
   <section>
     <h2><span class="pn">${gi + 1}</span>${esc(g.제목)} <em>${esc(g.분야)}</em></h2>
-    <p class="meta">본문 ${g.본문.replace(/!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?/g, '').length.toLocaleString()}자 · 검토 ${g.검토.length}건</p>
+    <p class="meta">본문 ${g.본문.replace(/!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?/g, '').length.toLocaleString()}자 · 검토 ${목록전체.length}건</p>
     <details class="src">
       <summary>글이 근거로 삼은 법령 ${g.근거.length}건</summary>
       <ul>${g.근거.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
@@ -152,7 +170,9 @@ const 본문HTML = 글목록.map((g, gi) => {
   </section>`
 }).join('')
 
-const 오늘 = new Date().toISOString().slice(0, 10)
+// toISOString() 은 UTC 라 자정~오전 9시에 구우면 어제 날짜가 박힌다.
+// 사외로 나가는 문서에 하루 전 날짜가 찍히면 검토자가 낡은 자료로 본다.
+const 오늘 = (d => new Date(d.getTime() - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 10))(new Date())
 const 급함수 = Object.entries(통계).filter(([n]) => ['본문이 비어 있음', '금액·요율', '시행일·적용기한'].includes(n))
   .reduce((a, [, v]) => a + v, 0)
 

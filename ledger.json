@@ -115,11 +115,11 @@
       "file": "posts/2026-08-04-취업규칙-불이익-변경.md",
       "ruleset": 1,
       "shape": {
-        "chars": 2213,
+        "chars": 2227,
         "images": 21,
         "headings": 7,
         "paragraphs": 15,
-        "paraLen": 83,
+        "paraLen": 85,
         "tables": 13,
         "titleLen": 34,
         "exactKeyword": 1,
@@ -210,15 +210,15 @@
       "file": "posts/2026-08-09-취업규칙-신고-대상.md",
       "ruleset": 2,
       "shape": {
-        "chars": 5614,
+        "chars": 5805,
         "images": 15,
-        "headings": 6,
-        "paragraphs": 161,
+        "headings": 7,
+        "paragraphs": 165,
         "paraLen": 34,
         "tables": 42,
         "titleLen": 26,
         "exactKeyword": 0,
-        "coreWord": 24
+        "coreWord": 27
       },
       "status": "draft",
       "postId": null,
@@ -234,15 +234,15 @@
       "file": "posts/2026-08-09-취업규칙-변경-신고-방법.md",
       "ruleset": 2,
       "shape": {
-        "chars": 3945,
+        "chars": 4196,
         "images": 16,
-        "headings": 6,
-        "paragraphs": 128,
+        "headings": 7,
+        "paragraphs": 133,
         "paraLen": 34,
         "tables": 17,
         "titleLen": 25,
         "exactKeyword": 0,
-        "coreWord": 34
+        "coreWord": 35
       },
       "status": "draft",
       "postId": null,
