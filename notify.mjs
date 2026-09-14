@@ -13,9 +13,20 @@
 
 import { readFileSync, existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
+
+/**
+ * 디스코드 차단기(`_공용/discord-guard/breaker.mjs`)를 불러온다.
+ * 이 폴더는 별도 저장소라 밖의 모듈이 없을 수도 있다. 없으면 null 을 돌려주고
+ * 평소대로 보낸다 — 알림이 차단기 때문에 끊기면 안 된다.
+ */
+async function 차단기불러오기() {
+  const p = join(HERE, '..', '..', '_공용', 'discord-guard', 'breaker.mjs')
+  if (!existsSync(p)) return null
+  try { return await import(pathToFileURL(p).href) } catch { return null }
+}
 const BRAND = 0xD85A30
 
 // ─── 설정 ───────────────────────────────────────────────────
@@ -39,13 +50,25 @@ async function send(embed) {
     console.log(`\n설정하려면 blog/.env 에:  DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...`)
     return false
   }
+  const payload = {
+    username: env('DISCORD_USERNAME') || 'speciai 블로그',
+    embeds: [{ color: BRAND, timestamp: new Date().toISOString(), ...embed }],
+  }
+
+  // 공용 차단기를 거친다. 이 저장소 밖에 있어서 없을 수도 있으니, 없으면 그냥 보낸다.
+  const 차단기 = await 차단기불러오기()
+  if (차단기) {
+    const r = await 차단기.postWebhook(WEBHOOK, payload, 'blog-notify')
+    if (r.skipped) { console.error(`⏭  ${r.reason}`); return false }
+    if (!r.ok) { console.error(`전송 실패 — ${r.reason}`); return false }
+    console.log('전송했습니다.')
+    return true
+  }
+
   const res = await fetch(WEBHOOK, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      username: env('DISCORD_USERNAME') || 'speciai 블로그',
-      embeds: [{ color: BRAND, timestamp: new Date().toISOString(), ...embed }],
-    }),
+    body: JSON.stringify(payload),
   })
   if (!res.ok) { console.error(`전송 실패 HTTP ${res.status} — ${await res.text()}`); return false }
   console.log('전송했습니다.')

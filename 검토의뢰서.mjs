@@ -234,7 +234,7 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>블로그 원고 검토 의뢰 — 스페셜아이</title>
+<title>블로그 원고 검토 의뢰 — 스페시아이</title>
 <style>
   :root {
     --ground:#F1F2EF; --surface:#FFFFFF; --sunken:#E7E9E4;
